@@ -10,6 +10,7 @@ typedef unsigned char byte;
 //input
 static byte n = 881;
 static byte t = 159;
+static byte p = 3;
 static byte q = 7673;
 
 //output

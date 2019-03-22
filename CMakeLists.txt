@@ -3,4 +3,8 @@ project(SKELYA_KEM_encrypt)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(SKELYA_KEM_encrypt main.cpp encryption/decrypt/const.h encryption/encrypt/const.h encryption/keyGeneration/const.h)
+add_executable(encryption/scr/decrypt/const.h
+        encryption/scr/encrypt/const.h
+        encryption/scr/keyGeneration/const.h
+        encryption/scr/keyGeneration/keyGeneration.cpp
+        encryption/scr/keyGeneration/keyGeneration.h encryption/scr/encrypt/encryption.cpp encryption/scr/encrypt/encryption.h)
