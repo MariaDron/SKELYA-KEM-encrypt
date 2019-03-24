@@ -5,16 +5,19 @@
 #ifndef SKELYA_KEM_ENCRYPT_CONST_H
 #define SKELYA_KEM_ENCRYPT_CONST_H
 
+using namespace std;
+
 typedef unsigned char byte;
 
 //input
-static byte n = 881;
+static int n = 881;
 static byte t = 159;
 static byte p = 3;
-static byte q = 7673;
+static int q = 7673;
 
 //output
-static byte k = 256;
+static int k = 256;
+static int polinomSize = 881;
 
 static int G[] = {1,  1, 0,	 1,	 1,	 0,	 1,	 0,	-1,	 1,	-1,	 1,	1,
                 0,	 1,	-1,	 1,	 1,	 1,	 0,	-1,	 1,	 1,	-1,	 0,	 1, -1,	-1,	 1,	 0,	-1,	-1,	-1,	 1,	 0,	 0,	 0,	 1,	 0,

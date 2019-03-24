@@ -6,16 +6,26 @@
 #include "const.h"
 #include <math.h>
 #include <stdlib.h>
+#include <tuple>
+#include <vector>
+
 using namespace std;
 
-std::tuple<int[], int[]> keyGeneration::GenKeys(u32 ctx) {
-    int f[] = p * F + 1;
-    int f_1[] = inverse(f);
-    int h[] = p * f_1 * G;
-    return std::make_tuple(f, h);
+Keys keyGeneration::GenKeys(u32 ctx) {
+    Keys keys = Keys();
+
+    for (int i = 0; i < polinomSize; i++)
+        keys.f[i] = F[i] * p;
+    // f + 1
+
+    int f_1[881]; //inverse(f);
+    for (auto i = 0; i < polinomSize; i++)
+        keys.h[i] = keys.f[i] * p * G[i]; //f_1[i] * p * G[i];
+
+    return keys;
 }
 
-std::list<int> keyGeneration::R3Gen(u32 ctx, byte T) {
+/*std::vector<int> keyGeneration::R3Gen(u32 ctx, byte T) {
     std::vector<int> R;
     byte k = 0;
     byte j = 0;
@@ -59,18 +69,18 @@ std::list<int> keyGeneration::R3Gen(u32 ctx, byte T) {
         }
     }
     return R;
-}
+}*/
 
-byte keyGeneration::inverse() {
+/*byte keyGeneration::inverse(std::vector vec) {
     return nullptr;
-}
+}*/
 
-int* keyGeneration::rand(u32 ctx, byte commonSize) {
+/*int* keyGeneration::rand(u32 ctx, byte commonSize) {
     int randBuf[commonSize];
     for (int i = 0; i < commonSize; i++)
         randBuf[i] = rand();
     return randBuf;
-}
+}*/
 
 byte keyGeneration::ceil(byte value) {
     return (byte) trunc(value);
