@@ -24,7 +24,7 @@ int* rand(u32 ctx, byte commonSize);
 byte ceil(byte value);
 byte subst(byte buf, byte size);
 int* unpack(byte value, byte buf);
-byte inverse();
+byte inverse(int key[]);
 
 public:
     Keys GenKeys(u32 ctx);
