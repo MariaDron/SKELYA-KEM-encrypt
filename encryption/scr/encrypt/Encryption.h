@@ -6,7 +6,8 @@
 #define SKELYA_KEM_ENCRYPT_ENCRYPTION_H
 
 #include <stdlib.h>
-#include <tuple>
+#include <vector>
+#include <string>
 
 typedef unsigned long u32;
 typedef unsigned char byte;
@@ -17,13 +18,8 @@ struct EncryptOutput {
 };
 
 class Encryption {
-
-    int count(int polynomial[], int value);
-    std::string* RE2OSP(int ring[], int ringSize, std::string *octetString);
-    //std::string I2OSP(int A, int oLen);
-
     public:
-        EncryptOutput Encrypt(u32 ctx, int m[] , int h[]);
+        EncryptOutput Encrypt(u32 ctx, std::vector<int> m, std::vector<int> h);
 
 };
 

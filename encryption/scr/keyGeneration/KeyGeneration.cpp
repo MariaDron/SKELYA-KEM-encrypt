@@ -2,7 +2,7 @@
 // Created by Maria_Dron on 3/19/2019.
 //
 
-#include "keyGeneration.h"
+#include "KeyGeneration.h"
 #include "../utils/const.h"
 #include <math.h>
 #include <stdlib.h>
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-Keys keyGeneration::GenKeys(u32 ctx) {
+Keys KeyGeneration::GenKeys(u32 ctx) {
     Keys keys = Keys();
 
     //f = F * p + 1
@@ -26,7 +26,7 @@ Keys keyGeneration::GenKeys(u32 ctx) {
     return keys;
 }
 
-byte keyGeneration::inverse(int *key) {
+byte KeyGeneration::inverse(int *key) {
     return 0;
 }
 

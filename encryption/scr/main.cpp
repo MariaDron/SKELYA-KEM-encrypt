@@ -3,19 +3,18 @@
 //
 
 #include <iostream>
-#include "keyGeneration/keyGeneration.h"
-#include "keyGeneration/keyGeneration.cpp"
+#include "keyGeneration/KeyGeneration.h"
 #include "encrypt/Encryption.h"
-#include "encrypt/Encryption.cpp"
+#include "utils/const.h"
 
 typedef unsigned long u32;
 
 int main() {
     u32 ctx = (u32)1355;
-    auto* keyGenerationObj = new keyGeneration();
+    KeyGeneration* keyGenerationObj = new KeyGeneration();
     Keys keys = keyGenerationObj->GenKeys(ctx);
 
-    std::cout << "f = " << std::endl;
+    std::cout << "f = ";
     for (int i = 0; i < polynomialGFSize; i++)
         std::cout << keys.f[i] << ", ";
 

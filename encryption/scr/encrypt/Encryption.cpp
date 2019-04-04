@@ -3,122 +3,89 @@
 //
 
 #include "Encryption.h"
-#include "../utils/const.h"
-#include "../utils/Utils.cpp"
+#include "../utils/Utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <vector>
 
 using namespace std;
 
-
-EncryptOutput Encryption::Encrypt(u32 ctx, int m[], int h[]) {
-    Utils utils;
+EncryptOutput Encryption::Encrypt(u32 ctx, std::vector<int> m, std::vector<int> h) {
+    Const* constClass = new Const();
+    Utils* utils = new Utils();
     EncryptOutput output;
     output.status = "ERROR";
-    if (mLenBytes <= maxMsgLenBytes) {
-        int b[db/8];
-        utils.random(ctx, db/8, b);
+    std::vector<int> R(h.size());
+    if (constClass->mLenBytes <= constClass->maxMsgLenBytes) {
+        std::vector<int> b = utils->random(ctx, constClass->db/8);
+        std::vector<int> m_(constClass->polynomialGFSize);
         while (output.status == "ERROR") {
-            int zero_count = bufferLenBytes - db / 8 - 1 - mLenBytes;
+            int zero_count = constClass->bufferLenBytes - constClass->db / 8 - 1 - constClass->mLenBytes;
             std::string zero_string(zero_count, '0' );
-            std::string octetString[(int) ceil((4 * qBit) / 8)];
-            int ring[] = {8191, 1002, 1, 600};
-            RE2OSP(ring, sizeof(ring) / sizeof(*ring), octetString);
 
             // M = b || mLenBytes || m || zero_string;
             std::string M;
-            for (int i = 0; i < sizeof(b)/sizeof(*b); i++) {
-                M.append(std::to_string(b[i]));
+            for (int i : b) {
+                M.append(std::to_string(i));
             }
-            M.append(std::to_string(mLenBytes));
-            for (int i = 0; i < sizeof(m)/sizeof(*m); i++) {
-                M.append(std::to_string(m[i]));
+            M.append(std::to_string(constClass->mLenBytes));
+            for (int i : m) {
+                M.append(std::to_string(i));
             }
             M.append(zero_string);
 
             //MTrin = code3to2(M);
-
-            int pkLen = sizeof(h)/sizeof(*h);
+            int pkLen = h.size();
 
             // sData = OID || m || b || utils.subst(h, pkLen / 8);
             std::string sData;
-            for (int i = 0; i < sizeof(OID)/sizeof(*OID); i++) {
-                sData.append(std::to_string(OID[i]));
+            for (byte i : constClass->OID) {
+                sData.append(std::to_string(i));
             }
-            for (int i = 0; i < sizeof(m)/sizeof(*m); i++) {
-                sData.append(std::to_string(m[i]));
+            for (int value : m) {
+                sData.append(std::to_string(value));
             }
-            for (int i = 0; i < sizeof(b)/sizeof(*b); i++) {
-                M.append(std::to_string(b[i]));
+            for (int value : b) {
+                sData.append(std::to_string(value));
             }
-            int substH[pkLen / 8];
-            utils.subst(h, pkLen / 8, substH);
-            for (int i = 0; i < pkLen / 8; i++) {
-                M.append(std::to_string(substH[i]));
+            std::vector<int> substH = utils->subst(h, 0, pkLen / 8 - 1);
+            for (int value : substH) {
+                sData.append(std::to_string(value));
             }
 
-            int R4[sizeof(r)/sizeof(*r)];
-            for (int i = 0; i < sizeof(r)/sizeof(*r); i++) {
-                R4[i] = (r[i] + h[i] % q) % 4;
+            for (int i = 0; i < h.size(); i++) {
+                R.push_back(constClass->r.at(i) + h.at(i) % constClass->q);
             }
-            std::string oR4[sizeof(R4)/sizeof(*R4)];
-            RE2OSP(R4, sizeof(R4)/sizeof(*R4), oR4);
-            //mask = MGF(oR4);
-            int m_[polynomialGFSize];
-            for (int i = 0; i < polynomialGFSize; i++) {
-                m_[i] = (MtrinEncrypt[i] + mask[i]) % p;
+
+            std::vector<int> R4;
+            int value;
+            for (int i : R) {
+                value = i % 4;
+                if (value < 0)
+                    value += 4;
+                R4.push_back(value);
             }
-            int c1 = count(m_, 1);
-            int c2 = count(m_, -1);
-            int c3 = count(m_, 0);
-            if (c1 >= t && c2 >= t && c3 >= t) {
+            std::vector<std::string> oR4 = utils->RE2OSP(R4);
+            std::vector<int> mask = utils->MGF(oR4);
+            for (int i = 0; i < constClass->polynomialGFSize; i++) {
+                m.push_back((constClass->MtrinEncrypt.at(i) + mask.at(i)) % constClass->p);
+            }
+            int c1 = utils->count(m_, 1);
+            int c2 = utils->count(m_, -1);
+            int c3 = utils->count(m_, 0);
+            if (c1 >= constClass->t && c2 >= constClass->t && c3 >= constClass->t) {
                 output.status = "OK";
             }
         }
-        /*e = R + m’ mod q;
-        output.E = RQOS(e);*/
+        //e = R + m_ mod q;
+        std::vector<int> e;
+        e.reserve(m_.size());
+        for (int i = 0; i < m_.size(); i++)
+            e.push_back((R.at(i) + m_.at(i)) % constClass->q);
+        //output.E = RQOS(e);
     }
+    delete utils;
     return output;
-}
-
-int Encryption::count(int *polynomial, int value) {
-    int count = 0;
-    for (int i = 0; i < sizeof(polynomial)/sizeof(*polynomial); i++) {
-        if (polynomial[i] == value) {
-            count++;
-        }
-    }
-    return count;
-}
-
-/**
- * Ring Element to Octet String Primitive
- */
-std::string *Encryption::RE2OSP(int ring[], int ringSize, std::string *octetString) {
-    std::string octetPrimitives;
-    std::string str;
-    octetString[(int) ceil((ringSize * qBit) / 8)];
-
-    for (int i = 0; i < ringSize; i++)
-        octetPrimitives.append(std::bitset<qBit>(ring[i]).to_string());
-
-    int i = 0;
-    int j = 0;
-    std::string octet;
-    while (true) {
-        if (i + 8 < octetPrimitives.size()) {
-            octet = octetPrimitives.substr(i, 8);
-            octetString[j] = octet;
-        } else {
-            std::string octet_str(8, '0');
-            octet_str.replace(8 - (octetPrimitives.size() - i), octetPrimitives.size() - i,
-                              octetPrimitives.substr(i, octetPrimitives.size()));
-            octetString[j] = octet_str;
-            return octetString;
-        }
-        i += 8;
-        j++;
-    }
 }
