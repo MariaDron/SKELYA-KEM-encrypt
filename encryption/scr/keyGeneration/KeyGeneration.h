@@ -17,14 +17,14 @@ struct Keys {
     int  h[881];
 };
 
-class keyGeneration {
+class KeyGeneration {
 
 std::vector<int> R3Gen(u32 ctx, byte T);
-int* rand(u32 ctx, byte commonSize);
+/*int* rand(u32 ctx, byte commonSize);
 byte ceil(byte value);
 byte subst(byte buf, byte size);
-int* unpack(byte value, byte buf);
-byte inverse();
+int* unpack(byte value, byte buf);*/
+byte inverse(int key[]);
 
 public:
     Keys GenKeys(u32 ctx);

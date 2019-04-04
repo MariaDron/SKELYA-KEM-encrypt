@@ -2,8 +2,8 @@
 // Created by Maria_Dron on 3/19/2019.
 //
 
-#include "keyGeneration.h"
-#include "const.h"
+#include "KeyGeneration.h"
+#include "../utils/const.h"
 #include <math.h>
 #include <stdlib.h>
 #include <tuple>
@@ -11,18 +11,23 @@
 
 using namespace std;
 
-Keys keyGeneration::GenKeys(u32 ctx) {
+Keys KeyGeneration::GenKeys(u32 ctx) {
     Keys keys = Keys();
 
-    for (int i = 0; i < polinomSize; i++)
+    //f = F * p + 1
+    for (int i = 0; i < polynomialGFSize; i++)
         keys.f[i] = F[i] * p;
-    // f + 1
+    keys.f[0]++;
 
-    int f_1[881]; //inverse(f);
-    for (auto i = 0; i < polinomSize; i++)
+    //int f_1[] = inverse(keys.f);
+    for (auto i = 0; i < polynomialGFSize; i++)
         keys.h[i] = keys.f[i] * p * G[i]; //f_1[i] * p * G[i];
 
     return keys;
+}
+
+byte KeyGeneration::inverse(int *key) {
+    return 0;
 }
 
 /*std::vector<int> keyGeneration::R3Gen(u32 ctx, byte T) {
@@ -60,19 +65,15 @@ Keys keyGeneration::GenKeys(u32 ctx) {
     j = 0;
 
     while (j < n) {
-        ind = iIndBuf [j];
+        ind = iIndBuf[j];
         j++;
         if (ind < max_ind - max_ind % i) {
             value = value % j;
-            //ind[j] = value;
+            iIndBuf[j] = value;
             j++;
         }
     }
     return R;
-}*/
-
-/*byte keyGeneration::inverse(std::vector vec) {
-    return nullptr;
 }*/
 
 /*int* keyGeneration::rand(u32 ctx, byte commonSize) {
@@ -81,15 +82,3 @@ Keys keyGeneration::GenKeys(u32 ctx) {
         randBuf[i] = rand();
     return randBuf;
 }*/
-
-byte keyGeneration::ceil(byte value) {
-    return (byte) trunc(value);
-}
-
-byte keyGeneration::subst(byte buf, byte size) {
-    return 0;
-}
-
-int *keyGeneration::unpack(byte value, byte buf) {
-    return nullptr;
-}
